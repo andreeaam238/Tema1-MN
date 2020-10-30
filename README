@@ -1,0 +1,121 @@
+Blaga Ana-Maria-Andreea, 314CB
+
+Part 1
+
+Functia "generate_probabilities_system" genereaza sistemul de ecuatii corespunzator unei diagrame, pornind de la numarul de randuri al acesteia, astfel:
+	- Se calculeaza in sum_el numarul de elemente care compun diagrama
+	- Se construiesc matricea sistemului si vectorul de termeni liberi astfel:
+		- Se initializeaza matricea sistemului cu o matrice diagonala, avand valoarea 6 pe aceasta(aceasta va ramane asa pentru elementele din interiorul diagramei, iar pentru restul elementelor va fi modificata)
+		- Se initializeaza vectorul de termeni liberi cu 0(nu se reuseste iesirea in labirint)
+		- Se adauga in matricea sistemului valorile corespunzatoare varfurilor diagramei, respectiv 4 pe diagonala si -1 la intersectia pe linie cu coloanele corespunzatoare elementelor vecine
+		- Se adauga in vectorul de termeni liberi valorile corespunzatoare varfurilor inferioare ale diagramei, respectiv 1(se reuseste iesirea din labirint)
+		- Se adauga in matricea sistemului valorile corespunzatoare elementelor aflate intre varfurile inferioare ale diagramei = marginea inferioara, respectiv 5 pe diagonala si -1 la intersectia pe linie cu coloanele corespunzatoare elementelor vecine
+		- Se adauga in vectorul de termeni liberi 1 pentru toate elementele aflate pe marginea inferioara
+		- Se adauga in matricea sistemului valorile corespunzatoare elementelor aflate pe marginile diagramei, intre varful superior si cele inferioare, respectiv 5 pe diagonala si -1 la intersectia pe linie cu coloanele corespunzatoare elementelor vecine
+		- Se adauga in matricea sistemului valorile corespunzatoare elementelor aflate in interiorul diagramei: marginite de varfuri, marginile laterale ale diagramei si marginea inferioara, respectiv -1 la intersectia pe linie cu coloanele corespunzatoare elementelor vecine
+
+Functia "matrix_to_csr" face conversia unei matrice din forma sa densa in format CSR, astfel:
+	- Se parcurg elementele matricei A:
+		- Daca elementul este nenul atunci este adaugat in vectorul values, iar indicele de coloana al acestuia in vectorul colind. Se incrementeaza contorul pentru evidenta elementelor nenule din matrice
+		- Daca este primul element nenul de pe o linie atunci i se pasteaza indicele de coloana in vectorul rowptr
+	- Se adauga pe ultima pozitie a vectorului rowptr nz(numarul de elemente nenule din matrice) + 1
+
+Functia "Jacobi_factorization" returneaza matricea de iteratie si vectorul de iteratie, reprezentative pentru metoda Jacobi, ale unui sistem liniar de ecuatii, astfel:
+	- Se separa matricea A in alte trei matrice, astfel:
+		- D = matrice diagonala
+		- L = matrice strict inferior triunghiulara
+		- U = matrice strict superior triunghiulara
+	- Se calculeaza matricele N si P conform formulelor specifice metodei Jacobi
+	- Se calculeaza matricea de iteratia Jacobi si vectorul de iteratie Jacobi formulelor specifice metodei Jacobi
+
+Functia "Jacobi_sparse" returneaza vectorul de solutii al unui sistem calculat folosind metoda Jacobi, astfel:
+	- Se stabileste aproximatia initiala, respectiv un vectorul nul
+	- Cat timp eroarea este mai mare decat toleranta se repeta procedeul:
+		- Se calculeaza noua aproximatie a lui x
+		- Se calculeaza eroarea ca norma a diferentei dintre valoarea veche a vectorului solutie si cea noua 
+
+Part 2
+
+Functia "clustering_pc" returneaza centrele de masa(pe care le calculeaza) a unui numar precizat de centroizi plecand de la o matrice de puncte(in matrice se afla coordonatele unui punct, cate o linie pentru fiecare punct), astfel:
+	- Se creeaza NC clustere conform regulei din cerinta
+	- Se creeaza NC centroizi conform regulei din cerinta
+	- Se repeta procedeul urmator pana cand centrele de masa ale centroizilor nu se mai modifica aproape deloc:
+		- Se initializeaza o lista cu NC puncte, goala. Astfel: point_list(i) corespunde lui points(i) si pastreaza indexul centroidului in care a fost clasat
+		- Se atribuie fiecarui punct din points cel mai aproapiat centroid folosind distanta euclidiana
+		- Se recalculeaza centrele de masa ale centroizilor conform listei de puncte, astfel centrul de masa al centroidului(i) va fi media aritmetica a coordonatelor punctelor care au in point_list indexul centroidului respectiv
+		- In cazul in care eroarea(calculat ca norma din diferenta dintre centrele de masa vechi si cele noi ale centroizilor) este mai mica decat toleranta inseamna ca centrele de masa nu se mai modifica aproape deloc si am obtinut rezultatul dorit
+
+Functia "compute_cost_pc" calculeaza costul minim al clustering-ului, adica distanta de la fiecare punct catre cel mai apropiat centroid, astfel:
+	- Se stabileste costul clustering-ului pentru fiecare punct folosind distanta euclidiana
+	- Costul trebuie sa fie minim, deci este luat drept cost pentru un punct distanta euclidiana pana la cel mai apropiat centroid
+	- Costul total minim se obtine prin insumarea costurilor minime pentru fiecare punct
+
+Part 3
+
+Functia "rgbHistogram" returneaza histograma RGB a unei imagini, astfel:
+	- Se citeste matricea imaginii
+	- Se stabilesc intervalele in care vor fi incadrati pixelii
+	- Se realizeaza histograma imaginii pe cele trei componenete, respectiv r, g si b si se elimina ultimul element din fiecare
+	- Concatenez cele trei componente pentru a obtine histograma imaginii
+
+Functia "convert" transforma o imagine in format RGB intr-o imagine in format HSV, astfel:
+	- Sunt aduse valorile componentelor r, g si b in intervalul [0, 1]
+	- Se concateneaza componentele r, g si b modificate
+	- Se determina valorile maxime, respectiv minime ale imaginii formate din componentele modificate
+	- Se calculeaza componentele h, s si v ale imaginii in format hsv
+	- Se concateneaza elementele h, s si v pentru a obtine imaaginea in format hsv
+
+Functia "hsvHistogram" returneaza histograma HSV a unei imagini, astfel:
+	- Se citeste matricea imaginii
+	- Se face conversia imaginii din format RGB in format HSV folosind functia convert
+	- Se stabilesc intervalele in care vor fi incadrati pixelii
+	- Se concateneaza cele trei componente pentru a obtine histograma imaginii
+
+Functia "Householder" realizeaza factorizarea unei matrice intr-o matrice ortogonala si una superior triunghiulara(algoritmul este cel din curs/laborator/disponibil pe site-ul de curs), astfel:
+	- Calculare reflector Householder
+	- Transformare coloana p din Ap
+	- Transformare coloanele p + 1 : n din Ap
+	- Transformare coloanele 1 : n din H
+
+Functia "SST" rezolva un sistem superior triunghiular prin metoda substitutiei(algoritmul este cel din curs/laborator/disponibil pe site-ul de curs), astfel:
+	- Se initializeaza vectorul de solutii cu 0
+	- Se obtine solutia sistemului prin substitutie inapoi
+
+Functia "preprocess" returneaza matricea de caracteristici si vectorul de etichete pentru un set de imagini cu sau fara pisici, astfel:
+	- Se stabilesc caile catre cele doua directoare cu imagini: cats, respectiv not_cats
+	- Se salveaza calea catre imaginile din cele doua foldere in doua matrice: cats, respectiv not_cats
+	- Se calculeaza histogramele imaginilor si acestea sunt salvate intr-o matrice
+	- Se initializeaza vectorul coloana de etichete cu 1 pentru imaginile cu pisici, respectiv -1 pentru cele fara pisici
+
+Functia "learn" returneaza vectorul de parametri ai modelului, astfel:
+	- Se bordeaza matricea de caracteristiic cu 1 pe ultima coloana
+	- Se factorizeaza Householder matricea de caracteristici
+	- Se rezolva sistemul de ecuatii folosind metoda substitutiei pe un sistem superior triunghiular
+
+Functia "evaluate" calculeaza procentul de imagini clasificate corect(cats/not cats), astfel:
+	- Se stabilesc caile catre cele doua directoare cu imagini: cats, respectiv not_cats
+	- Se salveaza calea catre imaginile din cele doua foldere in doua matrice: cats, respectiv not_cats
+	- Se initializeaza numarul de imagini clasificate corect cu 0, si a cata coloana trebuie bordata cu 1
+	- Se calculeaza histogramele imaginilor, iar matricea rezultata se bodeaza cu 1 pe a max_col coloana
+	- Se verifica daca imaginea a fost clasificata corect, respectiv produsul dintre w si matricea bordata este 1 pentru imagini cu pisici si -1 pentru imagini fara pisici
+	- Se calculeaza procentajul de imagini clasificate corect
+
+Part 4
+
+Functia "learn" returneaza vectorul de parametri ai modelului folosind algoritmul Mini-batch Gradient Descent, astfel:
+	- Se scaleaza matricea de caracteristici conform formulei din cerinta
+	- Se bordeaza matricea de caracteristici cu 1 pe a n + 1 coloana
+	- Se initializeaza vectorul de parametri ai modelului cu valori random 
+	- Se repeta procedeul de epochs ori:
+		- X_b si y_b sunt intializati cu batch_size linii random din X, respectiv y(acestea sunt perechi)
+		- Se calculeaza vectorul de parametri ai modelului
+
+Functia "evaluate" calculeaza procentul de imagini clasificate corect(cats/not cats), astfel:
+	- Se stabilesc caile catre cele doua directoare cu imagini: cats, respectiv not_cats
+	- Se salveaza calea catre imaginile din cele doua foldere in doua matrice: cats, respectiv not_cats
+	- Se calculeaza histogramele imaginilor si acestea sunt salvate intr-o matrice
+	- Se scaleaza matricea de caracteristici conform formulei din cerinta
+	- Se bordeaza matricea de caracteristici cu 1 pe a n + 1 coloana
+	- Se initializeaza vectorul coloana de etichete cu 1 pentru imaginile cu pisici, respectiv -1 pentru cele fara pisici
+	- Se verifica daca imaginea a fost clasificata corect, respectiv y(i) are acelasi semn cu produsul dintre linia i din X si vectorul de parametrii ai modelului
+	- Se calculeaza procentajul de imagini clasificate corect
